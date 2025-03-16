@@ -32,9 +32,8 @@ iniciar_fibonacci:
     li $t2, 1    # F(1) = 1, inicializamos el segundo número de Fibonacci
     li $t3, 0    # Inicializamos el contador de términos generados
 
-    # Inicializamos los registros para la suma de la serie
-    li $t4, 0    # Parte baja de la suma (32 bits)
-    li $t5, 0    # Parte alta de la suma (32 bits)
+    # Inicializamos el registro para la suma
+    li $t4, 0    # Parte baja de la suma acumulada
 
     # Imprimimos el mensaje de inicio de la serie
     li $v0, 4
@@ -54,10 +53,8 @@ loop_fib:
     li $a0, 32  # Cargamos el valor ASCII del espacio
     syscall  # Llamamos a la syscall para imprimir el espacio
 
-    # Acumulamos la suma de la serie usando doble precisión
-    add $t4, $t4, $t1  # Sumamos el número actual a la parte baja de la suma
-    slt $t6, $t4, $t1  # Verificamos si hubo un desbordamiento en la parte baja
-    add $t5, $t5, $t6  # Si hubo desbordamiento, sumamos 1 a la parte alta de la suma
+    # Acumulamos la suma de la serie
+    add $t4, $t4, $t1  # Sumamos el número actual a la suma
 
     # Calculamos el siguiente número de Fibonacci
     add $t7, $t1, $t2  # Calculamos F(n+1) = F(n) + F(n-1)
@@ -73,24 +70,12 @@ fin:
     la $a0, mensaje_suma
     syscall  # Imprimimos el mensaje de la suma
 
-    # Imprimimos la parte alta de la suma, si es diferente de 0
-    bnez $t5, imprimir_parte_alta  # Si la parte alta no es 0, imprimimosla
-    j imprimir_parte_baja  # Si no hay parte alta, solo imprimimos la parte baja
-
-imprimir_parte_alta:
+    # Imprimimos la suma total
     li $v0, 1
-    move $a0, $t5  # Colocamos la parte alta de la suma en $a0
-    syscall  # Llamamos a la syscall para imprimir la parte alta
-
-    li $v0, 11
-    li $a0, 32  # Cargamos el valor ASCII de un espacio
-    syscall  # Imprimimos un espacio entre la parte alta y baja de la suma
-
-imprimir_parte_baja:
-    li $v0, 1
-    move $a0, $t4  # Colocamos la parte baja de la suma en $a0
-    syscall  # Llamamos a la syscall para imprimir la parte baja
+    move $a0, $t4  # Colocamos la suma total en $a0
+    syscall  # Llamamos a la syscall para imprimir la suma
 
     # Terminamos el programa
     li $v0, 10  # Preparamos la syscall para salir
     syscall  # Llamamos a la syscall para finalizar
+
